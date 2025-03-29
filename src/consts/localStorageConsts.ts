@@ -3,5 +3,6 @@ export const LOCAL_STORAGE_KEYS = {
     PROJECTS: 'projects',
     STORIES: 'stories',
     CURRENT_USER: 'currentUser',
-    USERS: 'users'
+    USERS: 'users',
+    TASKS: 'tasks',
 };
