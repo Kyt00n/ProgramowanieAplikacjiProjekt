@@ -9,7 +9,7 @@ export class UserService {
         new User(4, "Maria", "Wiśniewska", "developer"),
     ];
     static mockLoggedInUser(): void {
-        this.loggedInUser = new User(1, "John", "Kowalski", "developer");
+        this.loggedInUser = this.users[1];
     }
     static getLoggedInUser(): User | null {
         return this.loggedInUser;

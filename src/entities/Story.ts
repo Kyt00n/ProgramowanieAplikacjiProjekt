@@ -1,15 +1,12 @@
-import { Project } from "./Project";
-import { User } from "./User";
-
 export class Story{
     constructor(
       public id: number,
       public name: string,
       public description: string,
       public priority: 'low' | 'medium' | 'high',
-      public project: Project,
+      public projectId: number,
       public status: 'todo' | 'doing' | 'done',
-      public owner: User,
+      public ownerId: number,
       public dateOfCreation: Date
     ){}
 }

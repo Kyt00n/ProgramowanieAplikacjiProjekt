@@ -36,4 +36,19 @@ export class TaskService {
         const updatedTasks = tasks.filter(task => task.id !== id);
         localStorage.setItem(this.storageKey, JSON.stringify(updatedTasks));
     }
+    static getTasksByStoryId(storyId: number): Task[] {
+        const tasks = this.getAllTasks();
+        return tasks.filter(task => task.storyId === storyId);
+    }
+    static assignTaskToUser(taskId: number, userId: number): void {
+        const tasks = this.getAllTasks();
+        const taskIndex = tasks.findIndex(task => task.id === taskId);
+
+        if (taskIndex !== -1) {
+            tasks[taskIndex].userId = userId;
+            localStorage.setItem(this.storageKey, JSON.stringify(tasks));
+        } else {
+            throw new Error(`Task with ID ${taskId} does not exist.`);
+        }
+    }
 }
