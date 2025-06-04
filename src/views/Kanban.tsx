@@ -47,13 +47,10 @@ const KanbanBoard: React.FC = () => {
     
 
  return (
-    <div>
-      <h1>Kanban Board</h1>
-        <div className="kanban-board">
-            {renderColumn("todo", "To Do")}
-            {renderColumn("doing", "Doing")}
-            {renderColumn("done", "Done")}
-        </div>
+    <div className="kanban-board">
+        {renderColumn("todo", "To Do")}
+        {renderColumn("doing", "Doing")}
+        {renderColumn("done", "Done")}
     </div>
   );
 };

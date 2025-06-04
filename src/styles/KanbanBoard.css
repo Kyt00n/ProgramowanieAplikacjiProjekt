@@ -1,0 +1,34 @@
+.kanban-board {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+  }
+  
+.kanban-column {
+    flex: 1;
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    min-height: 300px;
+  }
+  
+.kanban-task {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 8px;
+    cursor: grab;
+  }
+  
+.kanban-task h4 {
+    margin: 0;
+    font-size: 16px;
+  }
+  
+.kanban-task p {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: #666;
+  }
