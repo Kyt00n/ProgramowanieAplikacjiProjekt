@@ -1,34 +1,129 @@
-.kanban-board {
-    display: flex;
-    gap: 16px;
-    padding: 16px;
-  }
-  
-.kanban-column {
-    flex: 1;
-    background-color: #f4f4f4;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 16px;
-    min-height: 300px;
-  }
-  
-.kanban-task {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 8px;
-    margin-bottom: 8px;
-    cursor: grab;
-  }
-  
-.kanban-task h4 {
-    margin: 0;
-    font-size: 16px;
-  }
-  
-.kanban-task p {
-    margin: 4px 0 0;
-    font-size: 14px;
-    color: #666;
-  }
+.kanban-board,
+.jira-board {
+  display: flex;
+  gap: 8px;
+  padding: 16px 8px;
+  height: 80vh;
+  background: #222;
+  box-sizing: border-box;
+  justify-content: center;
+  align-items: flex-start;
+  font-family: 'Consolas', 'Courier New', monospace;
+  color: #00ff00;
+}
+
+.kanban-column,
+.jira-column {
+  flex: 1 1 0;
+  min-width: 220px;
+  max-width: 320px;
+  background: #111;
+  border: 2px solid #00ff00;
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 8px 0;
+  min-height: 60vh;
+}
+
+.jira-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px 4px 12px;
+  border-bottom: 2px solid #00ff00;
+  background: #111;
+  font-family: inherit;
+}
+
+.jira-column-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #00ff00;
+  text-shadow: 0 0 2px #00ff00;
+  font-family: inherit;
+}
+
+.jira-task-count {
+  background: #222;
+  border: 1px solid #00ff00;
+  border-radius: 0;
+  padding: 1px 6px;
+  font-size: 12px;
+  color: #00ff00;
+  font-weight: bold;
+  font-family: inherit;
+}
+
+.jira-tasks-list {
+  flex: 1;
+  padding: 8px 12px 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kanban-task,
+.jira-task-card {
+  background: #111;
+  border-radius: 0;
+  border: 2px solid #00ff00;
+  box-shadow: none;
+  padding: 8px 10px;
+  margin: 0;
+  cursor: pointer;
+  font-family: inherit;
+  color: #00ff00;
+  transition: background 0.1s, color 0.1s;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kanban-task:active,
+.jira-task-card:active {
+  background: #222;
+  color: #fff;
+  border-color: #fff;
+}
+
+.jira-task-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #00ff00;
+  font-family: inherit;
+  text-shadow: 0 0 2px #00ff00;
+}
+
+.jira-task-desc {
+  font-size: 12px;
+  color: #00ff00;
+  margin-top: 2px;
+  font-family: inherit;
+}
+
+.jira-task-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #222;
+  border: 2px solid #00ff00;
+  border-radius: 0;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #00ff00;
+  font-size: 16px;
+  line-height: 20px;
+  text-align: center;
+  font-family: inherit;
+  transition: background 0.1s, color 0.1s;
+}
+.jira-task-close-btn:hover {
+  background: #00ff00;
+  color: #111;
+  border-color: #fff;
+}

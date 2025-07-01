@@ -1,0 +1,176 @@
+.taskmodal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.7);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.taskmodal-form {
+  background: #111;
+  border: 2px solid #00ff00;
+  color: #00ff00;
+  font-family: 'Consolas', 'Courier New', monospace;
+  padding: 24px;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-radius: 0;
+  position: relative;
+}
+
+.taskmodal-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #222;
+  border: 2px solid #00ff00;
+  color: #00ff00;
+  font-family: inherit;
+  font-weight: bold;
+  border-radius: 0;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.taskmodal-title {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.taskmodal-input {
+  background: #111;
+  border: 2px solid #00ff00;
+  color: #00ff00;
+  font-family: inherit;
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 0;
+}
+
+.taskmodal-row {
+  display: flex;
+  gap: 8px;
+}
+
+.taskmodal-select {
+  background: #111;
+  border: 2px solid #00ff00;
+  color: #00ff00;
+  font-family: inherit;
+  font-size: 16px;
+  border-radius: 0;
+}
+
+.taskmodal-submit-btn {
+  background: #111;
+  border: 2px solid #00ff00;
+  color: #00ff00;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 0;
+  padding: 4px 12px;
+  cursor: pointer;
+  margin-top: 12px;
+}
+.taskmodal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.7);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.taskmodal-form {
+  background: #111;
+  border: 2px solid #00ff00;
+  color: #00ff00;
+  font-family: 'Consolas', 'Courier New', monospace;
+  padding: 24px;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-radius: 0;
+  position: relative;
+}
+
+.taskmodal-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #222;
+  border: 2px solid #00ff00;
+  color: #00ff00;
+  font-family: inherit;
+  font-weight: bold;
+  border-radius: 0;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.taskmodal-title {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.taskmodal-input {
+  background: #111;
+  border: 2px solid #00ff00;
+  color: #00ff00;
+  font-family: inherit;
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 0;
+}
+
+.taskmodal-row {
+  display: flex;
+  gap: 8px;
+}
+
+.taskmodal-select {
+  background: #111;
+  border: 2px solid #00ff00;
+  color: #00ff00;
+  font-family: inherit;
+  font-size: 16px;
+  border-radius: 0;
+}
+
+.taskmodal-submit-btn {
+  background: #111;
+  border: 2px solid #00ff00;
+  color: #00ff00;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 0;
+  padding: 4px 12px;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+/* Extra style for delete button in DeleteTaskModal */
+.taskmodal-submit-btn.danger {
+  border-color: #ff0033;
+  color: #ff0033;
+}

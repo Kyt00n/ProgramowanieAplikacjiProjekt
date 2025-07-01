@@ -17,6 +17,18 @@ export class TaskService {
 
         localStorage.setItem(this.storageKey, JSON.stringify(tasks));
     }
+    //edit task
+    static updateTask(task: Task): void {
+        const tasks = this.getAllTasks();
+        const existingIndex = tasks.findIndex(t => t.id === task.id);
+
+        if (existingIndex !== -1) {
+            tasks[existingIndex] = task; // Update existing task
+            localStorage.setItem(this.storageKey, JSON.stringify(tasks));
+        } else {
+            throw new Error(`Task with ID ${task.id} does not exist.`);
+        }
+    }
 
     // Get all Tasks
     static getAllTasks(): Task[] {
