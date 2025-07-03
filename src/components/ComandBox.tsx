@@ -3,6 +3,7 @@ import { Task } from "../entities/Task";
 import { AddTaskModal, handleAddTask } from "../commands/tasks/addTaskCommand";
 import { EditTaskModal, handleEditTask } from "../commands/tasks/editTaskCommand";
 import { DeleteTaskModal, handleDeleteTask } from "../commands/tasks/deleteTaskCommand";
+import { LoginModal, handleLogin } from "../commands/login/loginCommand";
 import { Story } from "../entities/Story";
 import { AddStoryModal, handleAddStory } from "../commands/stories/addStoryCommand";
 import { EditStoryModal, handleEditStory } from "../commands/stories/editStoryCommand";
@@ -33,12 +34,14 @@ const CommandBox: React.FC<{ onRequestViewChange?: (view: "kanban" | "stories" |
   const [editProject, setEditProject] = useState<Project | null>(null);
   const [deleteProject, setDeleteProject] = useState<Project | null>(null);
 
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCommand(e.target.value);
   };
 
-  const handleCommand = (cmd: string) => {
+  const handleCommand = async (cmd: string) => {
     let response = "";
     const trimmed = cmd.trim();
     const lower = trimmed.toLowerCase();
@@ -117,13 +120,19 @@ const CommandBox: React.FC<{ onRequestViewChange?: (view: "kanban" | "stories" |
       const parts = trimmed.split(" ");
       const id = Number(parts[2]);
       if (!isNaN(id)) {
-        const project = ProjectService.getProjectById(id);
-        if (project) {
-          setEditProject(project);
-          response = `Opening Edit Project modal for #${id}...`;
-        } else {
-          response = `Project #${id} not found.`;
-        }
+        ProjectService.getProjectById(id).then(project => {
+      if (project) {
+        setEditProject(project);
+        response = `Opening Edit Project modal for #${id}...`;
+      } else {
+        response = `Project #${id} not found.`;
+      }
+      setHistory((prev) => [...prev, `> ${cmd}`, response]);
+    }).catch(() => {
+      response = `Project #${id} not found.`;
+      setHistory((prev) => [...prev, `> ${cmd}`, response]);
+    });
+    return;
       } else {
         response = "Usage: edit project <id>";
       }
@@ -131,19 +140,26 @@ const CommandBox: React.FC<{ onRequestViewChange?: (view: "kanban" | "stories" |
       const parts = trimmed.split(" ");
       const id = Number(parts[2]);
       if (!isNaN(id)) {
-        const project = ProjectService.getProjectById(id);
+        const project = ProjectService.getProjectById(id).then(project => {
         if (project) {
           setDeleteProject(project);
           response = `Opening Delete Project modal for #${id}...`;
         } else {
           response = `Project #${id} not found.`;
         }
+        setHistory((prev) => [...prev, `> ${cmd}`, response]);
+      }).catch(() => {
+          response = `Project #${id} not found.`;
+          setHistory((prev) => [...prev, `> ${cmd}`, response]);
+        });
+        return;
       } else {
         response = "Usage: delete project <id>";
       }
     } 
     else if (lower === "login") {
-      response = "Login: (Not implemented)";
+      setShowLoginModal(true);
+      response = "Opening Login modal...";
     } else if (lower === "kanban") {
         onRequestViewChange?.("kanban");
         response = "Switched to Kanban view.";
@@ -263,6 +279,12 @@ const CommandBox: React.FC<{ onRequestViewChange?: (view: "kanban" | "stories" |
           project={deleteProject}
           onClose={() => setDeleteProject(null)}
           onDelete={onDeleteProject}
+        />
+      )}
+      {showLoginModal && (
+        <LoginModal
+          onClose={() => setShowLoginModal(false)}
+          onLogin={() => setShowLoginModal(false)}
         />
       )}
       <div className="commandbox-root">

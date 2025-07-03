@@ -1,20 +1,30 @@
-import React from "react";
-import { ProjectService } from "../services/ProjectService";
+import React, { useEffect } from "react";
 import ProjectCard from "../components/ProjectCard";
+import "../styles/Projects.css";
 
-const Projects: React.FC = () => {
-  const projects = ProjectService.getAllProjects();
+interface ProjectsProps {
+  projects: any[];
+  fetchProjects: () => void;
+}
+
+const Projects: React.FC<ProjectsProps> = ({ projects, fetchProjects }) => {
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: 24 }}>
-      <h2 style={{ color: "#00ff00", fontFamily: "Consolas, Courier New, monospace" }}>Projects</h2>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {projects.length === 0 && (
-          <div style={{ color: "#00ff00" }}>No projects found.</div>
+    <div className="projects-container">
+      <h2 className="projects-title">Projects</h2>
+      <div className="projects-list">
+        {projects === undefined ? (
+          <div className="projects-message">Loading...</div>
+        ) : projects.length === 0 ? (
+          <div className="projects-message">No projects found.</div>
+        ) : (
+          projects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))
         )}
-        {projects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
-        ))}
       </div>
     </div>
   );

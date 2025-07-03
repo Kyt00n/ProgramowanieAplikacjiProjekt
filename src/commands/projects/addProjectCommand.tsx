@@ -6,17 +6,19 @@ import "../../styles/TaskModal.css";
 export const AddProjectModal: React.FC<{
   onClose: () => void;
   onAdd: (project: Omit<Project, "id">) => void;
-}> = ({ onClose, onAdd }) => {
+  onProjectsChanged: () => void; // Add this prop
+}> = ({ onClose, onAdd, onProjectsChanged }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    onAdd({
+    await onAdd({
       name,
       description,
     });
+    onProjectsChanged();
     onClose();
   };
 
@@ -56,19 +58,14 @@ export const AddProjectModal: React.FC<{
   );
 };
 
-export function handleAddProject(
+export async function handleAddProject(
   project: Omit<Project, "id">,
   setHistory: React.Dispatch<React.SetStateAction<string[]>>
 ) {
-  const allProjects = ProjectService.getAllProjects();
-  const newId =
-    allProjects.length > 0
-      ? Math.max(...allProjects.map((p) => p.id)) + 1
-      : 1;
-  const newProject: Project = {
-    ...project,
-    id: newId,
-  };
-  ProjectService.saveProject(newProject);
-  setHistory((prev) => [...prev, "Project added!"]);
+  try {
+    await ProjectService.saveProject(project);
+    setHistory((prev) => [...prev, "Project added!"]);
+  } catch (e) {
+    setHistory((prev) => [...prev, "Failed to add project!"]);
+  }
 }
