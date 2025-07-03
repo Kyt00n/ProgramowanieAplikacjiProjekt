@@ -55,4 +55,12 @@ export class ProjectService {
         });
         if (!res.ok) throw new Error("Failed to delete project");
     }
+    static selectProject(id: number) {
+        localStorage.setItem("selectedProjectId", id.toString());
+    }
+
+    static getSelectedProjectId(): number | null {
+        const value = localStorage.getItem("selectedProjectId");
+        return value ? Number(value) : null;
+    }
 }

@@ -1,66 +1,81 @@
-import { LOCAL_STORAGE_KEYS } from "../consts/localStorageConsts";
 import { Task } from "../entities/Task";
 
 export class TaskService {
-    private static storageKey = LOCAL_STORAGE_KEYS.TASKS;
-
-    // Create or Update a Task
-    static saveTask(task: Task): void {
-        const tasks = this.getAllTasks();
-        const existingIndex = tasks.findIndex(t => t.id === task.id);
-
-        if (existingIndex !== -1) {
-            tasks[existingIndex] = task; // Update existing task
-        } else {
-            tasks.push(task); // Add new task
-        }
-
-        localStorage.setItem(this.storageKey, JSON.stringify(tasks));
-    }
-    //edit task
-    static updateTask(task: Task): void {
-        const tasks = this.getAllTasks();
-        const existingIndex = tasks.findIndex(t => t.id === task.id);
-
-        if (existingIndex !== -1) {
-            tasks[existingIndex] = task; // Update existing task
-            localStorage.setItem(this.storageKey, JSON.stringify(tasks));
-        } else {
-            throw new Error(`Task with ID ${task.id} does not exist.`);
-        }
+    static async getAllTasks(): Promise<Task[]> {
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:3000/tasks", {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Failed to fetch tasks");
+        return await res.json();
     }
 
-    // Get all Tasks
-    static getAllTasks(): Task[] {
-        const tasksJson = localStorage.getItem(this.storageKey);
-        return tasksJson ? JSON.parse(tasksJson) : [];
+    static async getTaskById(id: number): Promise<Task> {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`http://localhost:3000/tasks/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Failed to fetch task");
+        return await res.json();
     }
 
-    // Get a single Task by ID
-    static getTaskById(id: number): Task | undefined {
-        const tasks = this.getAllTasks();
-        return tasks.find(task => task.id === id);
+    static async saveTask(task: Omit<Task, "id">): Promise<Task> {
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:3000/tasks", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(task)
+        });
+        if (!res.ok) throw new Error("Failed to save task");
+        return await res.json();
     }
 
-    // Delete a Task by ID
-    static deleteTask(id: number): void {
-        const tasks = this.getAllTasks();
-        const updatedTasks = tasks.filter(task => task.id !== id);
-        localStorage.setItem(this.storageKey, JSON.stringify(updatedTasks));
+    static async updateTask(task: Task): Promise<Task> {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(task)
+        });
+        if (!res.ok) throw new Error("Failed to update task");
+        return await res.json();
     }
-    static getTasksByStoryId(storyId: number): Task[] {
-        const tasks = this.getAllTasks();
-        return tasks.filter(task => task.storyId === storyId);
-    }
-    static assignTaskToUser(taskId: number, userId: number): void {
-        const tasks = this.getAllTasks();
-        const taskIndex = tasks.findIndex(task => task.id === taskId);
 
-        if (taskIndex !== -1) {
-            tasks[taskIndex].userId = userId;
-            localStorage.setItem(this.storageKey, JSON.stringify(tasks));
-        } else {
-            throw new Error(`Task with ID ${taskId} does not exist.`);
-        }
+    static async deleteTask(id: number): Promise<void> {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`http://localhost:3000/tasks/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Failed to delete task");
+    }
+
+    static async getTasksByStoryId(storyId: number): Promise<Task[]> {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`http://localhost:3000/tasks?storyId=${storyId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Failed to fetch tasks by story");
+        return await res.json();
+    }
+
+    static async assignTaskToUser(taskId: number, userId: number): Promise<Task> {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`http://localhost:3000/tasks/${taskId}/assign`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ userId })
+        });
+        if (!res.ok) throw new Error("Failed to assign task");
+        return await res.json();
     }
 }

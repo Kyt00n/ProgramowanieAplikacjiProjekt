@@ -62,6 +62,6 @@ export function handleEditProject(
   updatedProject: Project,
   setHistory: React.Dispatch<React.SetStateAction<string[]>>
 ) {
-  ProjectService.saveProject(updatedProject);
+  ProjectService.editProject(updatedProject);
   setHistory((prev) => [...prev, `Project #${updatedProject.id} updated!`]);
 }

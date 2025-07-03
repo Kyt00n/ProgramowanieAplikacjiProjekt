@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Story } from "../../entities/Story";
 import { StoryService } from "../../services/StoryService";
+import { ProjectService } from "../../services/ProjectService";
 import "../../styles/TaskModal.css";
 
 export const AddStoryModal: React.FC<{
   onClose: () => void;
-  onAdd: (story: Omit<Story, "id" | "dateOfCreation">) => void;
+  onAdd: (story: Omit<Story, "id">) => void;
 }> = ({ onClose, onAdd }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -20,9 +21,10 @@ export const AddStoryModal: React.FC<{
       name,
       description,
       priority,
-      projectId: StoryService["getSelectedProjectId"]?.() ?? 0,
+      projectId: ProjectService.getSelectedProjectId() ?? 0,
       status,
       ownerId,
+      dateOfCreation: new Date(),
     });
     onClose();
   };
@@ -96,17 +98,14 @@ export const AddStoryModal: React.FC<{
   );
 };
 
-export function handleAddStory(
-  story: Omit<Story, "id" | "dateOfCreation">,
+export async function handleAddStory(
+  story: Omit<Story, "id">,
   setHistory: React.Dispatch<React.SetStateAction<string[]>>
 ) {
-  const stories = StoryService.getStoriesForSelectedProject();
-  const newId = stories.length > 0 ? Math.max(...stories.map((s) => s.id)) + 1 : 1;
-  const newStory: Story = {
-    ...story,
-    id: newId,
-    dateOfCreation: new Date(),
-  };
-  StoryService.saveStory(newStory);
-  setHistory((prev) => [...prev, "Story added!"]);
+  try {
+    await StoryService.saveStory(story);
+    setHistory((prev) => [...prev, "Story added!"]);
+  } catch {
+    setHistory((prev) => [...prev, "Failed to add story!"]);
+  }
 }

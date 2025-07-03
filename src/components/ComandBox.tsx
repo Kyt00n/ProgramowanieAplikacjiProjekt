@@ -17,7 +17,13 @@ import { TaskService } from "../services/TaskService";
 import { StoryService } from "../services/StoryService";
 import "../styles/CommandBox.css";
 
-const CommandBox: React.FC<{ onRequestViewChange?: (view: "kanban" | "stories" | "projects") => void }> = ({ onRequestViewChange }) => {
+const CommandBox: React.FC<{ 
+  onRequestViewChange?: (view: "kanban" | "stories" | "projects") => void;
+  onProjectsChanged: () => void;
+  onStoriesChanged: () => void;
+  onTasksChanged: () => void;
+  onAnyChanged: () => void;
+ }> = ({ onRequestViewChange, onProjectsChanged, onStoriesChanged, onTasksChanged, onAnyChanged }) => {
   const [command, setCommand] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -55,32 +61,40 @@ const CommandBox: React.FC<{ onRequestViewChange?: (view: "kanban" | "stories" |
       const parts = trimmed.split(" ");
       const id = Number(parts[2]);
       if (!isNaN(id)) {
-        const task = TaskService.getTaskById(id);
-        if (task) {
-          setEditTask(task);
-          response = `Opening Edit Task modal for #${id}...`;
-        } else {
+        try {
+          const task = await TaskService.getTaskById(id);
+          if (task) {
+            setEditTask(task);
+            response = `Opening Edit Task modal for #${id}...`;
+          } else {
+            response = `Task #${id} not found.`;
+          }
+        } catch {
           response = `Task #${id} not found.`;
         }
       } else {
         response = "Usage: edit task <id>";
       }
-    } 
+    }
     else if (lower.startsWith("delete task")) {
       const parts = trimmed.split(" ");
       const id = Number(parts[2]);
       if (!isNaN(id)) {
-        const task = TaskService.getTaskById(id);
-        if (task) {
-          setDeleteTask(task);
-          response = `Opening Delete Task modal for #${id}...`;
-        } else {
+        try {
+          const task = await TaskService.getTaskById(id);
+          if (task) {
+            setDeleteTask(task);
+            response = `Opening Delete Task modal for #${id}...`;
+          } else {
+            response = `Task #${id} not found.`;
+          }
+        } catch {
           response = `Task #${id} not found.`;
         }
       } else {
         response = "Usage: delete task <id>";
       }
-    }
+    } 
     // Story commands
     else if (lower === "add story") {
       setShowAddStoryModal(true);
@@ -89,11 +103,15 @@ const CommandBox: React.FC<{ onRequestViewChange?: (view: "kanban" | "stories" |
       const parts = trimmed.split(" ");
       const id = Number(parts[2]);
       if (!isNaN(id)) {
-        const story = StoryService.getStoryById(id);
-        if (story) {
-          setEditStory(story);
-          response = `Opening Edit Story modal for #${id}...`;
-        } else {
+        try {
+          const story = await StoryService.getStoryById(id);
+          if (story) {
+            setEditStory(story);
+            response = `Opening Edit Story modal for #${id}...`;
+          } else {
+            response = `Story #${id} not found.`;
+          }
+        } catch {
           response = `Story #${id} not found.`;
         }
       } else {
@@ -103,11 +121,15 @@ const CommandBox: React.FC<{ onRequestViewChange?: (view: "kanban" | "stories" |
       const parts = trimmed.split(" ");
       const id = Number(parts[2]);
       if (!isNaN(id)) {
-        const story = StoryService.getStoryById(id);
-        if (story) {
-          setDeleteStory(story);
-          response = `Opening Delete Story modal for #${id}...`;
-        } else {
+        try {
+          const story = await StoryService.getStoryById(id);
+          if (story) {
+            setDeleteStory(story);
+            response = `Opening Delete Story modal for #${id}...`;
+          } else {
+            response = `Story #${id} not found.`;
+          }
+        } catch {
           response = `Story #${id} not found.`;
         }
       } else {
@@ -117,46 +139,42 @@ const CommandBox: React.FC<{ onRequestViewChange?: (view: "kanban" | "stories" |
       setShowAddProjectModal(true);
       response = "Opening Add Project modal...";
     } else if (lower.startsWith("edit project")) {
-      const parts = trimmed.split(" ");
-      const id = Number(parts[2]);
-      if (!isNaN(id)) {
-        ProjectService.getProjectById(id).then(project => {
+  const parts = trimmed.split(" ");
+  const id = Number(parts[2]);
+  if (!isNaN(id)) {
+    try {
+      const project = await ProjectService.getProjectById(id);
       if (project) {
         setEditProject(project);
         response = `Opening Edit Project modal for #${id}...`;
       } else {
         response = `Project #${id} not found.`;
       }
-      setHistory((prev) => [...prev, `> ${cmd}`, response]);
-    }).catch(() => {
+    } catch {
       response = `Project #${id} not found.`;
-      setHistory((prev) => [...prev, `> ${cmd}`, response]);
-    });
-    return;
+    }
+  } else {
+    response = "Usage: edit project <id>";
+  }
+} else if (lower.startsWith("delete project")) {
+  const parts = trimmed.split(" ");
+  const id = Number(parts[2]);
+  if (!isNaN(id)) {
+    try {
+      const project = await ProjectService.getProjectById(id);
+      if (project) {
+        setDeleteProject(project);
+        response = `Opening Delete Project modal for #${id}...`;
       } else {
-        response = "Usage: edit project <id>";
+        response = `Project #${id} not found.`;
       }
-    } else if (lower.startsWith("delete project")) {
-      const parts = trimmed.split(" ");
-      const id = Number(parts[2]);
-      if (!isNaN(id)) {
-        const project = ProjectService.getProjectById(id).then(project => {
-        if (project) {
-          setDeleteProject(project);
-          response = `Opening Delete Project modal for #${id}...`;
-        } else {
-          response = `Project #${id} not found.`;
-        }
-        setHistory((prev) => [...prev, `> ${cmd}`, response]);
-      }).catch(() => {
-          response = `Project #${id} not found.`;
-          setHistory((prev) => [...prev, `> ${cmd}`, response]);
-        });
-        return;
-      } else {
-        response = "Usage: delete project <id>";
-      }
-    } 
+    } catch {
+      response = `Project #${id} not found.`;
+    }
+  } else {
+    response = "Usage: delete project <id>";
+  }
+}
     else if (lower === "login") {
       setShowLoginModal(true);
       response = "Opening Login modal...";
@@ -170,6 +188,17 @@ const CommandBox: React.FC<{ onRequestViewChange?: (view: "kanban" | "stories" |
     else if (lower === "projects") {
       onRequestViewChange?.("projects");
       response = "Switched to Projects view.";
+    }
+    // Select project command
+    else if (lower.startsWith("select project")) {
+      const parts = trimmed.split(" ");
+      const id = Number(parts[2]);
+      if (!isNaN(id)) {
+        ProjectService.selectProject(id);
+        response = `Project #${id} selected.`;
+      } else {
+        response = "Usage: select project <id>";
+      }
     }
     else if (trimmed === "") {
       response = "";
@@ -189,34 +218,43 @@ const CommandBox: React.FC<{ onRequestViewChange?: (view: "kanban" | "stories" |
   // Task handlers
   const onAddTask = (task: Omit<Task, "id" | "dateOfCreation">) => {
     handleAddTask(task, setHistory);
+    onTasksChanged();
   };
   const onEditTask = (task: Task) => {
     handleEditTask(task, setHistory);
+    onTasksChanged();
   };
   const onDeleteTask = (taskId: number) => {
     handleDeleteTask(taskId, setHistory);
+    onTasksChanged();
   };
 
   // Story handlers
-  const onAddStory = (story: Omit<Story, "id" | "dateOfCreation">) => {
+  const onAddStory = (story: Omit<Story, "id">) => {
     handleAddStory(story, setHistory);
+    onStoriesChanged();
   };
   const onEditStory = (story: Story) => {
     handleEditStory(story, setHistory);
+    onStoriesChanged();
   };
   const onDeleteStory = (storyId: number) => {
     handleDeleteStory(storyId, setHistory);
+    onStoriesChanged();
   };
 
   // Project handlers
   const onAddProject = (project: Omit<Project, "id">) => {
     handleAddProject(project, setHistory);
+    onProjectsChanged();
   };
   const onEditProject = (project: Project) => {
     handleEditProject(project, setHistory);
+    onProjectsChanged();
   };
   const onDeleteProject = (projectId: number) => {
     handleDeleteProject(projectId, setHistory);
+    onProjectsChanged();
   };
 
   return (

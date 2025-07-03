@@ -1,28 +1,32 @@
 import React from "react";
 import { Task } from "../entities/Task";
-import { TaskService } from "../services/TaskService";
 import "../styles/KanbanBoard.css";
 import TaskCard from "../components/TaskCard";
 import TaskView from "./Task";
 
-const KanbanBoard: React.FC = () => {
-  const [tasks, setTasks] = React.useState<Task[]>(() => TaskService.getAllTasks());
+interface KanbanBoardProps {
+  tasks: Task[];
+  fetchTasks: () => void;
+}
+
+const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, fetchTasks }) => {
   const [selectedTaskId, setSelectedTaskId] = React.useState<number | null>(null);
 
   const handleDragStart = (e: React.DragEvent, taskId: number) => {
     e.dataTransfer.setData("taskId", taskId.toString());
   };
 
-  const handleDrop = (e: React.DragEvent, newStatus: Task["status"]) => {
+  const handleDrop = async (e: React.DragEvent, newStatus: Task["status"]) => {
     const taskId = parseInt(e.dataTransfer.getData("taskId"), 10);
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === taskId ? { ...task, status: newStatus } : task
-      )
-    );
-    TaskService.saveTask(
-      tasks.find((task) => task.id === taskId)!
-    );
+    // Find the task to update
+    const taskToUpdate = tasks.find((task) => task.id === taskId);
+    if (taskToUpdate && taskToUpdate.status !== newStatus) {
+      // Update the task status in the backend
+      await import("../services/TaskService").then(({ TaskService }) =>
+        TaskService.updateTask({ ...taskToUpdate, status: newStatus })
+      );
+      fetchTasks(); // Refresh tasks from backend
+    }
   };
 
   const allowDrop = (e: React.DragEvent) => {
@@ -63,6 +67,10 @@ const KanbanBoard: React.FC = () => {
       </div>
     </div>
   );
+
+  React.useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
 
   return (
     <div style={{ position: "relative", minHeight: "100vh" }}>

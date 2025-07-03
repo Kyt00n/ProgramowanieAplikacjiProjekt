@@ -6,8 +6,7 @@ import "../../styles/TaskModal.css";
 export const AddProjectModal: React.FC<{
   onClose: () => void;
   onAdd: (project: Omit<Project, "id">) => void;
-  onProjectsChanged: () => void; // Add this prop
-}> = ({ onClose, onAdd, onProjectsChanged }) => {
+}> = ({ onClose, onAdd }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
@@ -18,7 +17,6 @@ export const AddProjectModal: React.FC<{
       name,
       description,
     });
-    onProjectsChanged();
     onClose();
   };
 

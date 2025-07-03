@@ -4,6 +4,9 @@ import 'dotenv/config'
 import cors from 'cors'
 import mongoose, { Schema, Document } from "mongoose"
 import { ProjectModel } from "./models/Project";
+import { StoryModel } from "./models/Story";
+import { TaskModel } from "./models/Task";
+
 declare global {
   namespace Express {
     interface Request {
@@ -159,6 +162,164 @@ app.delete("/projects/:id", verifyToken, async (req, res) => {
   res.sendStatus(204);
 });
 
+// Get a project by ID
+app.get("/projects/:id", verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  const project = await ProjectModel.findOne({ id: Number(req.params.id), ownerId: userId });
+  if (!project) return res.status(404).send("Project not found or not yours");
+  res.json(project);
+});
+
+app.get("/stories", verifyToken, async (req, res) => {
+  const stories = await StoryModel.find();
+  res.json(stories);
+});
+
+// Get a story by ID
+app.get("/stories/:id", verifyToken, async (req, res) => {
+  const story = await StoryModel.findOne({ id: Number(req.params.id) });
+  if (!story) return res.status(404).send("Story not found");
+  res.json(story);
+});
+
+// Add a new story
+app.post("/stories", verifyToken, async (req, res) => {
+  const { name, description, priority, projectId, status, ownerId, dateOfCreation } = req.body;
+  const last = await StoryModel.findOne().sort({ id: -1 });
+  const newId = last ? last.id + 1 : 1;
+  const story = new StoryModel({
+    id: newId,
+    name,
+    description,
+    priority,
+    projectId,
+    status,
+    ownerId,
+    dateOfCreation: dateOfCreation ? new Date(dateOfCreation) : new Date()
+  });
+  await story.save();
+  res.status(201).json(story);
+});
+
+// Edit a story
+app.put("/stories/:id", verifyToken, async (req, res) => {
+  const { name, description, priority, projectId, status, ownerId, dateOfCreation } = req.body;
+  const story = await StoryModel.findOneAndUpdate(
+    { id: Number(req.params.id) },
+    { name, description, priority, projectId, status, ownerId, dateOfCreation },
+    { new: true }
+  );
+  if (!story) return res.status(404).send("Story not found");
+  res.json(story);
+});
+
+// Delete a story
+app.delete("/stories/:id", verifyToken, async (req, res) => {
+  const result = await StoryModel.findOneAndDelete({ id: Number(req.params.id) });
+  if (!result) return res.status(404).send("Story not found");
+  res.sendStatus(204);
+});
+app.get("/tasks", verifyToken, async (req, res) => {
+  // Optional: filter by storyId if provided as query param
+  const { storyId } = req.query;
+  let filter: any = {};
+  if (storyId) filter.storyId = Number(storyId);
+  const tasks = await TaskModel.find(filter);
+  res.json(tasks);
+});
+
+// Get a task by ID
+app.get("/tasks/:id", verifyToken, async (req, res) => {
+  const task = await TaskModel.findOne({ id: Number(req.params.id) });
+  if (!task) return res.status(404).send("Task not found");
+  res.json(task);
+});
+
+// Add a new task
+app.post("/tasks", verifyToken, async (req, res) => {
+  const {
+    name,
+    description,
+    storyId,
+    priority,
+    status,
+    dateOfCreation,
+    userId,
+    dateStart,
+    dateEnd,
+    estimatedTime
+  } = req.body;
+  const last = await TaskModel.findOne().sort({ id: -1 });
+  const newId = last ? last.id + 1 : 1;
+  const task = new TaskModel({
+    id: newId,
+    name,
+    description,
+    storyId,
+    priority,
+    status,
+    dateOfCreation: dateOfCreation ? new Date(dateOfCreation) : new Date(),
+    userId,
+    dateStart,
+    dateEnd,
+    estimatedTime
+  });
+  await task.save();
+  res.status(201).json(task);
+});
+
+// Edit a task
+app.put("/tasks/:id", verifyToken, async (req, res) => {
+  const {
+    name,
+    description,
+    storyId,
+    priority,
+    status,
+    dateOfCreation,
+    userId,
+    dateStart,
+    dateEnd,
+    estimatedTime
+  } = req.body;
+  const task = await TaskModel.findOneAndUpdate(
+    { id: Number(req.params.id) },
+    {
+      name,
+      description,
+      storyId,
+      priority,
+      status,
+      dateOfCreation,
+      userId,
+      dateStart,
+      dateEnd,
+      estimatedTime
+    },
+    { new: true }
+  );
+  if (!task) return res.status(404).send("Task not found");
+  res.json(task);
+});
+
+// Delete a task
+app.delete("/tasks/:id", verifyToken, async (req, res) => {
+  const result = await TaskModel.findOneAndDelete({ id: Number(req.params.id) });
+  if (!result) return res.status(404).send("Task not found");
+  res.sendStatus(204);
+});
+
+// Assign a task to a user
+app.post("/tasks/:id/assign", verifyToken, async (req, res) => {
+  const { userId } = req.body;
+  const task = await TaskModel.findOneAndUpdate(
+    { id: Number(req.params.id) },
+    { userId },
+    { new: true }
+  );
+  if (!task) return res.status(404).send("Task not found");
+  res.json(task);
+});
 function generateToken(expirationInSeconds: number) {
   const exp = Math.floor(Date.now() / 1000) + expirationInSeconds
   const token = jwt.sign({ exp, foo: 'bar' }, tokenSecret, { algorithm: 'HS256' })
