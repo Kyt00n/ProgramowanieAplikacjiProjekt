@@ -1,4 +1,3 @@
-import { LOCAL_STORAGE_KEYS } from "../consts/localStorageConsts";
 import { Project } from "../entities/Project";
 
 export class ProjectService {

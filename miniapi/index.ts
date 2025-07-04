@@ -20,7 +20,6 @@ const port = 3000
 const tokenSecret = process.env.TOKEN_SECRET as string
 let refreshToken: string
 
-// --- User Mongoose Model ---
 interface IUser extends Document {
   id: number;
   login: string;
@@ -40,7 +39,6 @@ const UserSchema = new Schema<IUser>({
 });
 
 const UserModel = mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
-// --------------------------
 
 const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/mydb";
 mongoose.connect(mongoUri)
@@ -120,14 +118,12 @@ app.post("/login", async (req, res) => {
   res.json({ user, token });
 });
 
-// Get all projects for the logged-in user
 app.get("/projects", verifyToken, async (req, res) => {
   const userId = req.user.id;
   const projects = await ProjectModel.find({ ownerId: userId });
   res.json(projects);
 });
 
-// Add a new project
 app.post("/projects", verifyToken, async (req, res) => {
   const userId = req.user.id;
   const { name, description } = req.body;
@@ -139,7 +135,6 @@ app.post("/projects", verifyToken, async (req, res) => {
   res.status(201).json(project);
 });
 
-// Edit a project
 app.put("/projects/:id", verifyToken, async (req, res) => {
   const userId = req.user.id;
   const { id } = req.params;
@@ -153,7 +148,6 @@ app.put("/projects/:id", verifyToken, async (req, res) => {
   res.json(project);
 });
 
-// Delete a project
 app.delete("/projects/:id", verifyToken, async (req, res) => {
   const userId = req.user.id;
   const { id } = req.params;
@@ -162,7 +156,6 @@ app.delete("/projects/:id", verifyToken, async (req, res) => {
   res.sendStatus(204);
 });
 
-// Get a project by ID
 app.get("/projects/:id", verifyToken, async (req, res) => {
   const userId = req.user.id;
   const project = await ProjectModel.findOne({ id: Number(req.params.id), ownerId: userId });
@@ -175,14 +168,12 @@ app.get("/stories", verifyToken, async (req, res) => {
   res.json(stories);
 });
 
-// Get a story by ID
 app.get("/stories/:id", verifyToken, async (req, res) => {
   const story = await StoryModel.findOne({ id: Number(req.params.id) });
   if (!story) return res.status(404).send("Story not found");
   res.json(story);
 });
 
-// Add a new story
 app.post("/stories", verifyToken, async (req, res) => {
   const { name, description, priority, projectId, status, ownerId, dateOfCreation } = req.body;
   const last = await StoryModel.findOne().sort({ id: -1 });
@@ -201,7 +192,6 @@ app.post("/stories", verifyToken, async (req, res) => {
   res.status(201).json(story);
 });
 
-// Edit a story
 app.put("/stories/:id", verifyToken, async (req, res) => {
   const { name, description, priority, projectId, status, ownerId, dateOfCreation } = req.body;
   const story = await StoryModel.findOneAndUpdate(
@@ -213,14 +203,12 @@ app.put("/stories/:id", verifyToken, async (req, res) => {
   res.json(story);
 });
 
-// Delete a story
 app.delete("/stories/:id", verifyToken, async (req, res) => {
   const result = await StoryModel.findOneAndDelete({ id: Number(req.params.id) });
   if (!result) return res.status(404).send("Story not found");
   res.sendStatus(204);
 });
 app.get("/tasks", verifyToken, async (req, res) => {
-  // Optional: filter by storyId if provided as query param
   const { storyId } = req.query;
   let filter: any = {};
   if (storyId) filter.storyId = Number(storyId);
@@ -228,14 +216,12 @@ app.get("/tasks", verifyToken, async (req, res) => {
   res.json(tasks);
 });
 
-// Get a task by ID
 app.get("/tasks/:id", verifyToken, async (req, res) => {
   const task = await TaskModel.findOne({ id: Number(req.params.id) });
   if (!task) return res.status(404).send("Task not found");
   res.json(task);
 });
 
-// Add a new task
 app.post("/tasks", verifyToken, async (req, res) => {
   const {
     name,
@@ -268,7 +254,6 @@ app.post("/tasks", verifyToken, async (req, res) => {
   res.status(201).json(task);
 });
 
-// Edit a task
 app.put("/tasks/:id", verifyToken, async (req, res) => {
   const {
     name,
@@ -302,14 +287,12 @@ app.put("/tasks/:id", verifyToken, async (req, res) => {
   res.json(task);
 });
 
-// Delete a task
 app.delete("/tasks/:id", verifyToken, async (req, res) => {
   const result = await TaskModel.findOneAndDelete({ id: Number(req.params.id) });
   if (!result) return res.status(404).send("Task not found");
   res.sendStatus(204);
 });
 
-// Assign a task to a user
 app.post("/tasks/:id/assign", verifyToken, async (req, res) => {
   const { userId } = req.body;
   const task = await TaskModel.findOneAndUpdate(
@@ -337,7 +320,7 @@ function verifyToken(req: any, res: any, next: any) {
       console.log(err)
       return res.status(401).send(err.message)
     }
-    req.user = user; // Attach user info to request
+    req.user = user; 
     next()
   })
 }

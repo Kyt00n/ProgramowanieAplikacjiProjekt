@@ -3,14 +3,28 @@ import { Task } from "../entities/Task";
 import "../styles/KanbanBoard.css";
 import TaskCard from "../components/TaskCard";
 import TaskView from "./Task";
+import { TaskService } from "../services/TaskService";
+import { ProjectService } from "../services/ProjectService";
+import { Story } from "../entities/Story";
 
 interface KanbanBoardProps {
   tasks: Task[];
+  stories: Story[]; 
   fetchTasks: () => void;
 }
 
-const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, fetchTasks }) => {
+const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, stories, fetchTasks }) => {
   const [selectedTaskId, setSelectedTaskId] = React.useState<number | null>(null);
+
+  const selectedProjectId = ProjectService.getSelectedProjectId();
+
+  const storyIdsForProject = selectedProjectId
+    ? stories.filter(story => story.projectId === selectedProjectId).map(story => story.id)
+    : [];
+
+  const filteredTasks = selectedProjectId
+    ? tasks.filter(task => storyIdsForProject.includes(task.storyId))
+    : tasks;
 
   const handleDragStart = (e: React.DragEvent, taskId: number) => {
     e.dataTransfer.setData("taskId", taskId.toString());
@@ -18,14 +32,14 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, fetchTasks }) => {
 
   const handleDrop = async (e: React.DragEvent, newStatus: Task["status"]) => {
     const taskId = parseInt(e.dataTransfer.getData("taskId"), 10);
-    // Find the task to update
     const taskToUpdate = tasks.find((task) => task.id === taskId);
     if (taskToUpdate && taskToUpdate.status !== newStatus) {
-      // Update the task status in the backend
-      await import("../services/TaskService").then(({ TaskService }) =>
-        TaskService.updateTask({ ...taskToUpdate, status: newStatus })
-      );
-      fetchTasks(); // Refresh tasks from backend
+      let updatedTask = { ...taskToUpdate, status: newStatus };
+      if (newStatus === "done") {
+        updatedTask.dateEnd = new Date();
+      }
+      await TaskService.updateTask(updatedTask);
+      fetchTasks();
     }
   };
 
@@ -50,11 +64,11 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, fetchTasks }) => {
       <div className="jira-column-header">
         <h3>{title}</h3>
         <span className="jira-task-count">
-          {tasks.filter((task) => task.status === status).length}
+          {filteredTasks.filter((task) => task.status === status).length}
         </span>
       </div>
       <div className="jira-tasks-list">
-        {tasks
+        {filteredTasks
           .filter((task) => task.status === status)
           .map((task) => (
             <TaskCard

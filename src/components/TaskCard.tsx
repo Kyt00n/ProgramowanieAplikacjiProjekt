@@ -1,7 +1,7 @@
 import React from "react";
 import { Task } from "../entities/Task";
 import "../styles/KanbanBoard.css";
-import "../styles/TaskCard.css"; // Make sure this import exists for styles
+import "../styles/TaskCard.css"; 
 
 const TaskCard: React.FC<{
   task: Task;

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import './App.css'
+import './styles/App.css'
 import KanbanBoard from './views/Kanban'
 import "./styles/KanbanBoard.css"
 import Stories from './views/Stories'
@@ -12,12 +12,10 @@ import { TaskService } from './services/TaskService'
 function App() {
   const [view, setView] = useState<"kanban" | "stories" | "projects">("kanban");
 
-  // State for all entities
   const [projects, setProjects] = useState<any[]>([]);
   const [stories, setStories] = useState<any[]>([]);
   const [tasks, setTasks] = useState<any[]>([]);
 
-  // Fetch functions
   const fetchProjects = useCallback(() => {
     ProjectService.getAllProjects()
       .then(setProjects)
@@ -34,7 +32,6 @@ function App() {
       .catch(() => setTasks([]));
   }, []);
 
-  // Unified refresh function
   const refreshAll = useCallback(() => {
     fetchProjects();
     fetchStories();
@@ -43,7 +40,7 @@ function App() {
 
   return (
     <div>
-      {view === "kanban" && <KanbanBoard tasks={tasks} fetchTasks={fetchTasks} />}
+      {view === "kanban" && <KanbanBoard tasks={tasks} stories={stories} fetchTasks={fetchTasks} />}
       {view === "stories" && <Stories stories={stories} fetchStories={fetchStories} />}
       {view === "projects" && <Projects projects={projects} fetchProjects={fetchProjects} />}
       <div style={{

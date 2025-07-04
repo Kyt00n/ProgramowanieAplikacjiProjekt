@@ -3,7 +3,7 @@ import { Task } from "../entities/Task";
 import { AddTaskModal, handleAddTask } from "../commands/tasks/addTaskCommand";
 import { EditTaskModal, handleEditTask } from "../commands/tasks/editTaskCommand";
 import { DeleteTaskModal, handleDeleteTask } from "../commands/tasks/deleteTaskCommand";
-import { LoginModal, handleLogin } from "../commands/login/loginCommand";
+import { LoginModal } from "../commands/login/loginCommand";
 import { Story } from "../entities/Story";
 import { AddStoryModal, handleAddStory } from "../commands/stories/addStoryCommand";
 import { EditStoryModal, handleEditStory } from "../commands/stories/editStoryCommand";
@@ -322,7 +322,9 @@ const CommandBox: React.FC<{
       {showLoginModal && (
         <LoginModal
           onClose={() => setShowLoginModal(false)}
-          onLogin={() => setShowLoginModal(false)}
+          onLogin={() => {
+            setShowLoginModal(false)
+            onAnyChanged();}}
         />
       )}
       <div className="commandbox-root">

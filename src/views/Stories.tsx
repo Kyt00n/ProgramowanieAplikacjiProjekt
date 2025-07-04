@@ -12,7 +12,6 @@ const Stories: React.FC<StoriesProps> = ({ stories, fetchStories }) => {
     fetchStories();
   }, [fetchStories]);
 
-  // Filter stories by selected project
   const selectedProjectId = ProjectService.getSelectedProjectId();
   const filteredStories = selectedProjectId
     ? stories.filter((story) => story.projectId === selectedProjectId)

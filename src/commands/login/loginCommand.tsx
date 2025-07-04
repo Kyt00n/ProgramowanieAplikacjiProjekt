@@ -72,7 +72,6 @@ export const LoginModal: React.FC<{
   );
 };
 
-// Utility for command box
 export async function handleLogin(
   credentials: { name: string; surname: string; password: string },
   setHistory: React.Dispatch<React.SetStateAction<string[]>>
@@ -88,7 +87,7 @@ export async function handleLogin(
       return;
     }
     const data = await res.json();
-    UserService.setLoggedInUser(data.user); // You may want to store the token as well
+    UserService.setLoggedInUser(data.user);
     setHistory((prev) => [...prev, "Login successful!"]);
   } catch {
     setHistory((prev) => [...prev, "Network error"]);

@@ -18,8 +18,15 @@ const TaskView: React.FC<TaskViewProps> = ({ taskId, onClose }) => {
   const [task, setTask] = React.useState<Task | undefined>(undefined);
 
   React.useEffect(() => {
-    const t = TaskService.getTaskById(taskId);
-    setTask(t);
+    const fetchTask = async () => {
+      try {
+        const t = await TaskService.getTaskById(taskId);
+        setTask(t);
+      } catch {
+        setTask(undefined);
+      }
+    };
+    fetchTask();
   }, [taskId]);
 
   if (!task) {

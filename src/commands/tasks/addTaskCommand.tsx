@@ -3,7 +3,6 @@ import { Task } from "../../entities/Task";
 import { TaskService } from "../../services/TaskService";
 import "../../styles/TaskModal.css";
 
-// Simple modal for adding a task
 export const AddTaskModal: React.FC<{
   onClose: () => void;
   onAdd: (task: Omit<Task, "id" | "dateOfCreation">) => void;
@@ -99,21 +98,17 @@ export const AddTaskModal: React.FC<{
   );
 };
 
-// handleAddTask logic extracted as a utility function
-export function handleAddTask(
+export async function handleAddTask(
   task: Omit<Task, "id" | "dateOfCreation">,
   setHistory: React.Dispatch<React.SetStateAction<string[]>>
 ) {
-  const allTasks = TaskService.getAllTasks();
-  const newId =
-    allTasks.length > 0
-      ? Math.max(...allTasks.map((t) => t.id)) + 1
-      : 1;
-  const newTask: Task = {
-    ...task,
-    id: newId,
-    dateOfCreation: new Date(),
-  };
-  TaskService.saveTask(newTask);
-  setHistory((prev) => [...prev, "Task added!"]);
+  try {
+    await TaskService.saveTask({
+      ...task,
+      dateOfCreation: new Date(), // Only if your backend expects it from frontend
+    });
+    setHistory((prev) => [...prev, "Task added!"]);
+  } catch {
+    setHistory((prev) => [...prev, "Failed to add task!"]);
+  }
 }
